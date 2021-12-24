@@ -1,6 +1,6 @@
 import numpy as np
 from Layers import *
-from post_cont import *
+from Modelling import *
 import matplotlib.pyplot as plt
 
 X_train = np.reshape([[1, 1], [0, 1],[0.5,0.5], [1, 0], [0, 0]], (5, 2, 1))
