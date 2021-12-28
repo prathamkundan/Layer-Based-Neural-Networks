@@ -1,24 +1,29 @@
+# Testing Neural Network for xor dataset
+
+from matplotlib import colors
 import numpy as np
+from numpy.random.mtrand import shuffle
 from Layers import *
 from Modelling import *
 import matplotlib.pyplot as plt
 
-X_train = np.reshape([[1, 1], [0, 1],[0.5,0.5], [1, 0], [0, 0]], (5, 2, 1))
-y_train = np.reshape([[0], [1], [0], [1], [0]], (5, 1, 1))
+
+X_train = np.array([[1, 1], [0, 1], [1, 0], [0, 0]])
+y_train = np.array([[0], [1], [1], [0]])
 
 network = [
-    Layer(n_x=2, n_y = 3, eta=0.2),
-    Activation(a_function = 'tanh'),
-    Layer(n_x = 3, n_y = 1, eta=0.1),
-    Activation(a_function = 'tanh')
+    Layer(n_x=2, n_y = 3, eta=0.3),
+    Activation(function = 'relu'),
+    Layer(n_x = 3, n_y = 1, eta=0.3),
+    Activation(function = 'relu')
 ]
 
-fit(model = network, X_train= X_train, Y_train= y_train, epochs=1000)
+err = fit(model = network, X_train= X_train, Y_train= y_train, epochs=1000, shuffle = False)
 vals = []
 points = []
 for x in np.linspace(0, 1, 20):
     for y in np.linspace(0, 1, 20):
-        z = predict(network, [[x], [y]])
+        z = predict(network, [[x, y]])
         points.append([x, y, z[0,0]])
 
 points = np.array(points)
