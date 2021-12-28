@@ -1,7 +1,5 @@
 # A Layer Based Neural Network Package
 
-This repo contains code for a simple Neural Network Package.
-
-It is an attempt to make a simplified version of Keras
+This repo contains code for a simple Neural Network Package (like keras).
 
 inspired by the videos by TheIndependentCoder
