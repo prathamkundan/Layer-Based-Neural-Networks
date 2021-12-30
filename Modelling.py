@@ -19,7 +19,7 @@ def predict(model, X):
 
     return output
 
-def fit(model, X_train, Y_train, epochs = 500, batch_size = 1, shuffle = True):
+def fit(model, X_train, Y_train, epochs = 500, batch_size = 1, shuffle = True, error_fun = 'mse'):
     '''
         Builds the Model
         Args:
@@ -33,7 +33,7 @@ def fit(model, X_train, Y_train, epochs = 500, batch_size = 1, shuffle = True):
         epochs: int (default: 500)
             Number of epochs :| 
         batch_size: int (default: 1)
-            Batch size for SDE
+            Batch size for SGD
         shuffle: bool default(True)
             For suffling training inputs
     '''
@@ -46,9 +46,10 @@ def fit(model, X_train, Y_train, epochs = 500, batch_size = 1, shuffle = True):
             
             y_pred = predict(model, X_train[idx[i:i+batch_size]])
             
-            error += mse(y_pred, Y_train[idx[i:i+batch_size]]).sum(axis = 0)
+            err_obj = Error_functions(error_fun)
+            error += err_obj.get_error(y_pred, Y_train[idx[i:i+batch_size]]).sum(axis = 0)
             
-            grad_error = mse_prime(calc = y_pred, actual = Y_train[idx[i:i+batch_size]])
+            grad_error = err_obj.get_error_gradient(calc = y_pred, actual = Y_train[idx[i:i+batch_size]])
             
             grad_y = grad_error
             
