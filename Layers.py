@@ -1,6 +1,5 @@
-from typing import no_type_check_decorator
+from Regularisers import Regularisation
 import numpy as np
-from numpy.core.fromnumeric import shape
 from scipy import signal
 from numpy import random
 
@@ -34,11 +33,12 @@ class Layer():
             Number of output neurons.
     '''
 
-    def __init__(self, n_x, n_y, eta=0.01, seed=69):
+    def __init__(self, n_x, n_y, eta=0.01, seed=69, regulariser = Regularisation.l2(0.0)):
         self.Nx = n_x  # The number of input neurons
         self.Ny = n_y  # The number of output neurons
         self.eta = eta  # Learning Rate
         self.random = np.random.RandomState(seed)
+        self.regulariser = regulariser
         # Initialising weights and biases
         self.W = self.random.normal(
             loc=0.0, scale=1.0, size=(self.Ny, self.Nx))
@@ -54,11 +54,12 @@ class Layer():
     def _backward(self, grad_EY):
         # Back-propagating
         grad_EX = np.dot(grad_EY, self.W)
-        delta_W = np.dot(grad_EY.T, self.X_in)
+        delta_W = np.dot(grad_EY.T, self.X_in) + self.regulariser(self.W)
         self.W -= self.eta * delta_W
         delta_B = grad_EY.sum(axis=0)
         self.B -= self.eta * delta_B
         return grad_EX
+
 
 
 class Activation():
@@ -120,14 +121,16 @@ class Convolutional():
         learning_rate: float
             learning rate of layer 
     '''
-    def __init__(self, input_shape, kernel_shape, n_kernels, seed=69, learning_rate = 0.01):
+
+    def __init__(self, input_shape, kernel_shape, n_kernels, seed=69, learning_rate=0.01):
         self.input_depth, input_height, input_width = input_shape
         self.input_dim = input_shape[1:]
         self.kernel_shape = kernel_shape
         self.n_kernel = n_kernels
         self.learning_rate = learning_rate
         self.random = np.random.RandomState(seed)
-        self.output_shape =  (n_kernels,) + (input_height - kernel_shape[0]+1, input_width - kernel_shape[1]+1)
+        self.output_shape = (n_kernels,) + (input_height -
+                                            kernel_shape[0]+1, input_width - kernel_shape[1]+1)
         self.K = random.normal(loc=0.0, scale=1.0, size=(
             n_kernels, self.input_depth)+kernel_shape)
         self.B = random.normal(
@@ -136,14 +139,14 @@ class Convolutional():
     def _forward(self, X_in):
         self.X_in = X_in
         self.output = np.copy(self.B)
-        
+
         for i in range(self.n_kernel):
             kernel = self.K[i]
-            for x,k in zip(X_in,kernel):
-                self.output[i] += signal.correlate2d(x,k, mode= 'valid')
+            for x, k in zip(X_in, kernel):
+                self.output[i] += signal.correlate2d(x, k, mode='valid')
 
         return (self.output)
-        
+
     def _backward(self, grad_Y):
         delta_B = grad_Y
         self.B -= self.learning_rate * delta_B
@@ -151,12 +154,15 @@ class Convolutional():
         grad_EX = np.zeros_like(self.X_in, dtype=np.float64)
         for i in range(self.n_kernel):
             for j in range(self.input_depth):
-                delta_K[i,j] += signal.correlate2d(self.X_in[j], grad_Y[i], mode= 'valid')
-                grad_EX[j] += signal.convolve2d(grad_Y[i], self.K[i,j], mode = 'full')
-        
+                delta_K[i, j] += signal.correlate2d(
+                    self.X_in[j], grad_Y[i], mode='valid')
+                grad_EX[j] += signal.convolve2d(grad_Y[i],
+                                                self.K[i, j], mode='full')
+
         self.B -= self.learning_rate * delta_B
         self.K -= self.learning_rate * delta_K
         return grad_EX
+
 
 class Reshape():
     def __init__(self, input_shape, output_shape) -> None:

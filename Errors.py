@@ -1,4 +1,3 @@
-from matplotlib.pyplot import axis
 import numpy as np
 
 class Error_functions():
@@ -23,7 +22,7 @@ class Error_functions():
     def __init__(self, function = 'mse'):
         if (function == 'mse'):
             self.get_error = lambda calc,actual: Error_functions.mse(calc, actual) 
-            self.get_error_gradient =  lambda calc,actual: Error_functions.mse(calc, actual)
+            self.get_error_gradient =  lambda calc,actual: Error_functions.mse_prime(calc, actual)
         if (function == 'bel'):
             self.get_error = lambda calc,actual: Error_functions.binary_entropy_loss(calc, actual) 
             self.get_error_gradient =  lambda calc,actual: Error_functions.bel_prime(calc, actual)

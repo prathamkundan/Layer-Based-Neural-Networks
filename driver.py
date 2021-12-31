@@ -12,13 +12,13 @@ X_train = np.array([[1, 1], [0, 1], [1, 0], [0, 0]])
 y_train = np.array([[0], [1], [1], [0]])
 
 network = [
-    Layer(n_x=2, n_y = 3, eta=0.3),
-    Activation(function = 'relu'),
-    Layer(n_x = 3, n_y = 1, eta=0.3),
-    Activation(function = 'relu')
+    Layer(n_x=2, n_y = 3, eta=0.3, regulariser=Regularisation.l1(0.001)),
+    Activation(function = 'sigmoid'),
+    Layer(n_x = 3, n_y = 1, eta=0.3, regulariser=Regularisation.l1(0.001)),
+    Activation(function = 'sigmoid')
 ]
 
-err = fit(model = network, X_train= X_train, Y_train= y_train, epochs=1000, shuffle = False)
+err = fit(model = network, X_train= X_train, Y_train= y_train, epochs=10000, shuffle = False)
 vals = []
 points = []
 for x in np.linspace(0, 1, 20):
