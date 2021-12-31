@@ -3,8 +3,8 @@
 from matplotlib import colors
 import numpy as np
 from numpy.random.mtrand import shuffle
-from Layers import *
-from Modelling import *
+from coNNstruct.Layers import *
+from coNNstruct.Modelling import *
 import matplotlib.pyplot as plt
 
 

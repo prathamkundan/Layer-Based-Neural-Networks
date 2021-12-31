@@ -1,4 +1,4 @@
-from Regularisers import Regularisation
+from .Regularisers import Regularisation
 import numpy as np
 from scipy import signal
 from numpy import random
@@ -14,23 +14,35 @@ class Layer():
         -----------------------
         n_x: int 
             Number of input neurons.
+        
         n_y: int 
             Number of output neurons.
+        
         eta: float (defaault 0.01)
             Learning rate
+        
         seed: int  (default 69)
             Seed for generating random weights/ biases
+        
+        regulariser: function (default Regularisation.l2(0.0) or No regularisation)
+            Adds L1/ L2 regularisation
 
         Parameters:
         -------------------------
         W: np.array (shape = (ny, nx))
             Weights initialised using the given seed value
+        
         B: np.array (shape = (1, ny))
             Biases initialised using the given seed value
+        
         N_x: int 
             Number of input neurons.
+        
         N_y: int 
             Number of output neurons.
+        
+        regulariser:
+            The regularisation function
     '''
 
     def __init__(self, n_x, n_y, eta=0.01, seed=69, regulariser = Regularisation.l2(0.0)):
@@ -112,12 +124,16 @@ class Convolutional():
         ------------------
         input_shape: tuple
             Shape of input
+
         kernel_shape: tuple
             Shape of kernel
+        
         n_kernel: int
             Depth of kernel/ number of kernels
+        
         seed: int
             Seed to initialise Kernels and Biases
+        
         learning_rate: float
             learning rate of layer 
     '''
@@ -131,6 +147,8 @@ class Convolutional():
         self.random = np.random.RandomState(seed)
         self.output_shape = (n_kernels,) + (input_height -
                                             kernel_shape[0]+1, input_width - kernel_shape[1]+1)
+
+        # Initialising Kaernel and Biases
         self.K = random.normal(loc=0.0, scale=1.0, size=(
             n_kernels, self.input_depth)+kernel_shape)
         self.B = random.normal(
@@ -140,6 +158,7 @@ class Convolutional():
         self.X_in = X_in
         self.output = np.copy(self.B)
 
+        # Calculation of Correlation
         for i in range(self.n_kernel):
             kernel = self.K[i]
             for x, k in zip(X_in, kernel):
@@ -148,10 +167,11 @@ class Convolutional():
         return (self.output)
 
     def _backward(self, grad_Y):
+        # Back-propagating
         delta_B = grad_Y
-        self.B -= self.learning_rate * delta_B
         delta_K = np.zeros_like(self.K, dtype=np.float64)
         grad_EX = np.zeros_like(self.X_in, dtype=np.float64)
+
         for i in range(self.n_kernel):
             for j in range(self.input_depth):
                 delta_K[i, j] += signal.correlate2d(
@@ -165,6 +185,17 @@ class Convolutional():
 
 
 class Reshape():
+    '''
+    Reshape Layer:
+    ------------------
+        Args:
+        ------------------
+        input_shape : tuple
+            The shape of input
+
+        output_shape : tuple
+            The shape of output
+    '''
     def __init__(self, input_shape, output_shape) -> None:
         self.input_shape = input_shape
         self.output_shape = output_shape

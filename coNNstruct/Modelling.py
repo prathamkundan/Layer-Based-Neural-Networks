@@ -1,6 +1,5 @@
 import sys
-from matplotlib.pyplot import axis
-from Errors import *
+from .Errors import *
 
 def predict(model, X):
     '''
